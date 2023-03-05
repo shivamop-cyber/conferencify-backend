@@ -1,10 +1,9 @@
-const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const validator = require('validator');
 
 const conferenceSchema = new mongoose.Schema({
   admin: {
-    type: ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: [true, 'Please signin to create conference'],
   },
   name: {
@@ -45,14 +44,14 @@ const conferenceSchema = new mongoose.Schema({
   reviewers: {
     type: [
       {
-        userId: ObjectId,
+        userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         alias: String,
       },
     ],
     default: [],
   },
-  authors: {
-    type: [ObjectId],
+  submissions: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Paper' }],
     default: [],
   },
   createdAt: {
@@ -60,10 +59,5 @@ const conferenceSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-// Compare Password
-// userSchema.methods.comparePassword = async function (password) {
-//   return await bcrypt.compare(password, this.password);
-// };
 
 module.exports = mongoose.model('Conference', conferenceSchema);

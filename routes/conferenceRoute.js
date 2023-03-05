@@ -3,6 +3,7 @@ const {
   createConference,
   getAllConferences,
   addReviewer,
+  submitPaper,
 } = require('../controllers/conferenceController');
 const { authenticateUser } = require('../middleware/auth');
 
@@ -12,7 +13,9 @@ router.route('/create').post(authenticateUser, createConference);
 
 router.route('/all').get(getAllConferences);
 
-router.route('/reviewer/add').patch(authenticateUser, addReviewer);
+router.route('/reviewer/add').post(authenticateUser, addReviewer);
+
+router.route('/paper/submit').post(authenticateUser, submitPaper);
 
 // router.route('/me').get(authenticateUser, getUserDetails);
 

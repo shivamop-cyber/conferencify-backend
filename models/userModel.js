@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { ObjectId } = require('mongodb');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -29,15 +28,15 @@ const userSchema = new mongoose.Schema({
     minLength: [2, 'Affiliation should have more than 2 characters'],
   },
   conferenceAdmin: {
-    type: [ObjectId],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conference' }],
     default: [],
   },
   conferenceReviewer: {
-    type: [ObjectId],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conference' }],
     default: [],
   },
-  conferenceAuthor: {
-    type: [ObjectId],
+  paperSubmissions: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Paper' }],
     default: [],
   },
   isVerfiedEmail: {

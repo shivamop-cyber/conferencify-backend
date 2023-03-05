@@ -15,11 +15,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // const product = require("./routes/productRoute");
 const user = require('./routes/userRoute');
 const conference = require('./routes/conferenceRoute');
+const verify = require('./routes/verification');
 // const payment = require("./routes/paymentRoute");
 
 // app.use("/api/v1", product);
 app.use('/api/v1/user', user);
 app.use('/api/v1/conference', conference);
+app.use('/verify', verify);
 // app.use("/api/v1", payment);
 
 // Middleware for Errors

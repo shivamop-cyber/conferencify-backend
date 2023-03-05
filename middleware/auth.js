@@ -23,7 +23,15 @@ exports.authenticateUser = async (req, res, next) => {
     return sendError(401, 'Invalid Access Token', res);
   }
 
-  req.user = await User.findById(decodedData.id);
+  try {
+    req.user = await User.findById(decodedData.id);
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+
+  if (!req.user) {
+    return sendError(401, 'Invalid User', res);
+  }
 
   next();
 };

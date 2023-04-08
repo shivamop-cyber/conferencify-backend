@@ -4,6 +4,7 @@ const validator = require('validator');
 const conferenceSchema = new mongoose.Schema({
   admin: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: [true, 'Please signin to create conference'],
   },
   name: {
@@ -44,7 +45,7 @@ const conferenceSchema = new mongoose.Schema({
   reviewers: {
     type: [
       {
-        userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         alias: String,
       },
     ],

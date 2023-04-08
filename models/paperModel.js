@@ -6,7 +6,8 @@ const paperSchema = new mongoose.Schema({
     required: [true, 'Please enter the authors fo the paper'],
   },
   conferenceId: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conference' }],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Conference',
     required: [true, 'Please enter the conference id'],
   },
   title: {
@@ -33,6 +34,22 @@ const paperSchema = new mongoose.Schema({
   plagiarismPercentage: {
     type: String,
     default: 'N/A',
+  },
+  status: {
+    type: String,
+    default: 'Unassigned',
+  },
+  review: {
+    type: [
+      {
+        question: { type: String },
+        verdict: { String },
+      },
+    ],
+  },
+  reviewer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   },
   createdAt: {
     type: Date,

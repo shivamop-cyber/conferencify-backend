@@ -4,6 +4,8 @@ const {
   getAllConferences,
   addReviewer,
   submitPaper,
+  assignReviewer,
+  submitReview,
 } = require('../controllers/conferenceController');
 const { authenticateUser } = require('../middleware/auth');
 
@@ -17,10 +19,10 @@ router.route('/reviewer/add').post(authenticateUser, addReviewer);
 
 router.route('/paper/submit').post(authenticateUser, submitPaper);
 
-// router.route('/me').get(authenticateUser, getUserDetails);
+router.route('/reviewer/assign').post(authenticateUser, assignReviewer);
 
-// router.route('/password/update').put(authenticateUser, updatePassword);
-
-// router.route('/me/update').put(authenticateUser, updateProfile);
+router.route('/paper/review/submit').post(authenticateUser, submitReview);
 
 module.exports = router;
+
+

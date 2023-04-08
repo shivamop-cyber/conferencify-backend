@@ -117,6 +117,7 @@ exports.submitPaper = async (req, res, next) => {
       abstract,
       url,
       paperId: conference.submissions.length + 1,
+      conferenceId,
     });
 
     for (const author of authorsObjects) {
@@ -128,21 +129,66 @@ exports.submitPaper = async (req, res, next) => {
 
     await conference.save();
 
-    const populatedConference = await Conference.findById(conference._id)
-      .populate('submissions')
-      .exec();
-    const populatedPaper = await Paper.findById(paper._id)
-      .populate('authors')
-      .exec();
+    // const populatedConference = await Conference.findById(conference._id)
+    //   .populate('submissions')
+    //   .exec();
+    // const populatedPaper = await Paper.findById(paper._id)
+    //   .populate('authors')
+    //   .exec();
     return res.status(200).json({
       success: true,
       conference,
       paper,
-      populatedConference,
-      populatedPaper,
     });
   } catch (err) {
     console.log(err);
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+// Assigning a reviewer for a paper
+exports.assignReviewer = async (req, res, next) => {
+  const { conferenceId, paperId, reviewerId } = req.body;
+  const user = req.user;
+  try {
+    const conference = await Conference.findById(conferenceId);
+    const reviewer = await User.findById(reviewerId);
+    const paper = await Paper.findById(paperId);
+
+    if (!conference.admin.equals(user._id)) {
+      return sendError(401, 'You should be an admin to assign reviewer', res);
+    }
+
+    if (!reviewer) {
+      return sendError(400, 'Enter a valid reviewer', res);
+    }
+
+    paper.reviewer = reviewerId;
+    paper.status = 'Pending';
+    await paper.save();
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+exports.submitReview = async (req, res, next) => {
+  const { paperId, verdict, review } = req.body;
+  const user = req.user;
+  try {
+    const paper = await Paper.findById(paperId);
+
+    if (!paper.reviewer.equals(user._id)) {
+      return sendError(401, 'You should be reviewer to submit review', res);
+    }
+
+    paper.status = verdict == 'approve' ? 'Approved' : 'Rejected';
+    paper.review = review;
+    await paper.save();
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
     return sendError(500, 'Server Error Occured', res);
   }
 };

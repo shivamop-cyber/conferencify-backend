@@ -286,6 +286,5 @@ exports.sendVerificationEmail = (userId, userEmail) => {
   transporter.sendMail(mailConfigurations, function (error, info) {
     if (error) throw Error(error);
     console.log('Email Sent Successfully');
-    console.log(info);
   });
 };

@@ -6,7 +6,6 @@ const { sendVerificationEmail } = require('../utils/email');
 // Register a User
 exports.registerUser = async (req, res, next) => {
   const { name, email, password, affiliation } = req.body;
-
   try {
     const user = await User.create({
       name,
@@ -30,6 +29,7 @@ exports.registerUser = async (req, res, next) => {
 
 // Login User
 exports.loginUser = async (req, res, next) => {
+  console.log(req.body);
   try {
     const { email, password } = req.body;
 

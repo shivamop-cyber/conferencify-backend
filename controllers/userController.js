@@ -23,7 +23,7 @@ exports.registerUser = async (req, res, next) => {
       message: 'User has been registered, Please verify the email to continue',
     });
   } catch (err) {
-    return sendError(500, 'Server Error Occured', res);
+    return sendError(500, err.message, res);
   }
 };
 

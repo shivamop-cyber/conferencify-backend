@@ -115,9 +115,13 @@ exports.updateProfile = async (req, res, next) => {
 // Get User Detail
 exports.getUserDetails = async (req, res, next) => {
   try {
+    const userDetails = await User.findById(req.user._id)
+      .populate('conferenceAdmin')
+      .populate('conferenceReviewer')
+      .populate('paperSubmissions');
     res.status(200).json({
       success: true,
-      user: req.user,
+      user: userDetails,
     });
   } catch (err) {
     return sendError(500, 'Server Error Occured', res);

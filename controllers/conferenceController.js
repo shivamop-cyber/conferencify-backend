@@ -45,6 +45,7 @@ exports.createConference = async (req, res, next) => {
 
   return res.status(201).json({
     success: true,
+    message: 'Conference Successfully Created',
     conference,
   });
 };

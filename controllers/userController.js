@@ -94,7 +94,7 @@ exports.updateProfile = async (req, res, next) => {
     affiliation: req.body.affiliation,
   };
   try {
-    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+    const user = await User.findByIdAndUpdate(req.user._id, newUserData, {
       new: true,
       runValidators: true,
       useFindAndModify: false,

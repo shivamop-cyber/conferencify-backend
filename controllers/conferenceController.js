@@ -53,7 +53,9 @@ exports.createConference = async (req, res, next) => {
 // Get all conferences
 exports.getAllConferences = async (req, res, next) => {
   try {
-    const allConferences = await Conference.find({});
+    const allConferences = await Conference.find({}).select(
+      'name acronym webpage'
+    );
     return res.status(200).json({
       success: true,
       conferences: allConferences,
@@ -81,7 +83,9 @@ exports.addReviewer = async (req, res, next) => {
     conference.reviewers.push({ userId: reviewer._id, alias });
     await conference.save();
 
-    return res.status(200).json({ success: true });
+    return res
+      .status(200)
+      .json({ success: true, message: 'Reviewer Successfully added' });
   } catch (err) {
     return sendError(500, 'Server Error Occured', res);
   }
@@ -138,6 +142,7 @@ exports.submitPaper = async (req, res, next) => {
     //   .exec();
     return res.status(200).json({
       success: true,
+      message: 'Paper successfully submitted',
       conference,
       paper,
     });
@@ -167,7 +172,9 @@ exports.assignReviewer = async (req, res, next) => {
     paper.status = 'Pending';
     await paper.save();
 
-    return res.status(200).json({ success: true });
+    return res
+      .status(200)
+      .json({ success: true, message: 'Reviewer Successfully assigned' });
   } catch (err) {
     return sendError(500, 'Server Error Occured', res);
   }
@@ -176,6 +183,7 @@ exports.assignReviewer = async (req, res, next) => {
 exports.submitReview = async (req, res, next) => {
   const { paperId, verdict, review } = req.body;
   const user = req.user;
+  console.log(req.user);
   try {
     const paper = await Paper.findById(paperId);
 
@@ -187,8 +195,42 @@ exports.submitReview = async (req, res, next) => {
     paper.review = review;
     await paper.save();
 
-    return res.status(200).json({ success: true });
+    return res
+      .status(200)
+      .json({ success: true, message: 'Review successfully submitted' });
   } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+// Get a Conference
+exports.getConference = async (req, res, next) => {
+  const { conferenceId } = req.params;
+  const user = req.user;
+  try {
+    const conference = await Conference.findById(conferenceId);
+
+    if (!conference) {
+      return sendError(403, 'Conference does not exist', res);
+    }
+
+    if (!conference.admin.equals(user._id)) {
+      return sendError(
+        401,
+        'You should be an admin to get conference details',
+        res
+      );
+    }
+
+    const conferenceDetails = await Conference.findById(conferenceId)
+      .populate('reviewers')
+      .populate('submissions');
+
+    return res
+      .status(200)
+      .json({ success: true, conference: conferenceDetails });
+  } catch (err) {
+    console.log(err);
     return sendError(500, 'Server Error Occured', res);
   }
 };

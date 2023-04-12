@@ -223,8 +223,8 @@ exports.getConference = async (req, res, next) => {
     }
 
     const conferenceDetails = await Conference.findById(conferenceId)
-      .populate('reviewers')
-      .populate('submissions');
+      .populate({ path: 'reviewers' })
+      .populate({ path: 'submissions', populate: { path: 'authors' } });
 
     return res
       .status(200)

@@ -45,7 +45,10 @@ const conferenceSchema = new mongoose.Schema({
   reviewers: {
     type: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
         alias: String,
       },
     ],

@@ -43,7 +43,7 @@ const paperSchema = new mongoose.Schema({
     type: [
       {
         question: { type: String },
-        verdict: { String },
+        verdict: { type: String },
       },
     ],
   },

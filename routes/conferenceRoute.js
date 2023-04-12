@@ -7,6 +7,7 @@ const {
   assignReviewer,
   submitReview,
   getConference,
+  sendUserEmail,
 } = require('../controllers/conferenceController');
 const { authenticateUser } = require('../middleware/auth');
 
@@ -25,5 +26,7 @@ router.route('/paper/submit').post(authenticateUser, submitPaper);
 router.route('/reviewer/assign').post(authenticateUser, assignReviewer);
 
 router.route('/paper/review/submit').post(authenticateUser, submitReview);
+
+router.route('/email/send').post(authenticateUser, sendUserEmail);
 
 module.exports = router;

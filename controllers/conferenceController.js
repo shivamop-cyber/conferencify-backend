@@ -3,6 +3,7 @@ const Paper = require('../models/paperModel');
 const User = require('../models/userModel');
 const sendToken = require('../utils/jwtToken');
 const sendError = require('../utils/errors');
+const { sendUserEmail } = require('../utils/email');
 
 // Create a conference
 exports.createConference = async (req, res, next) => {
@@ -75,6 +76,10 @@ exports.addReviewer = async (req, res, next) => {
 
     if (!conference.admin.equals(user._id)) {
       return sendError(401, 'You should be an admin to add reviewer', res);
+    }
+
+    if (!reviewer) {
+      return sendError(400, 'The reviewer is not registered', res);
     }
 
     reviewer.conferenceReviewer.push(conferenceId);
@@ -233,4 +238,43 @@ exports.getConference = async (req, res, next) => {
     console.log(err);
     return sendError(500, 'Server Error Occured', res);
   }
+};
+
+exports.sendUserEmail = async (req, res, next) => {
+  const { conferenceId, paperIds, mailSubject, mailBody } = req.body;
+  console.log(req.body);
+  const user = req.user;
+
+  try {
+    for (let i = 0; i < paperIds.length; i++) {
+      const paperId = paperIds[i];
+
+      const paper = await Paper.findOne({ paperId: paperId }).populate(
+        'authors'
+      );
+      const conference = await Conference.findById(conferenceId);
+
+      // console.log('Authors', paper.authors);
+      const authors = [...paper.authors];
+      console.log('Authors ', authors);
+
+      for (let j = 0; j < authors.length; j++) {
+        await sendUserEmail(
+          authors[j].email,
+          mailSubject,
+          mailBody,
+          authors[j].name,
+          conference.acronym
+        );
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    return sendError(500, 'Server error occured', res);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Emails have been send successfully',
+  });
 };

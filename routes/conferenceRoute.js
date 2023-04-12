@@ -8,6 +8,7 @@ const {
   submitReview,
   getConference,
   sendUserEmail,
+  getReviewPapers,
 } = require('../controllers/conferenceController');
 const { authenticateUser } = require('../middleware/auth');
 
@@ -18,6 +19,10 @@ router.route('/create').post(authenticateUser, createConference);
 router.route('/all').get(getAllConferences);
 
 router.route('/single/:conferenceId').get(authenticateUser, getConference);
+
+router
+  .route('/review/paper/:conferenceId')
+  .get(authenticateUser, getReviewPapers);
 
 router.route('/reviewer/add').post(authenticateUser, addReviewer);
 

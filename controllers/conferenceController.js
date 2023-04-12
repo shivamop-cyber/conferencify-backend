@@ -186,7 +186,8 @@ exports.assignReviewer = async (req, res, next) => {
 };
 
 exports.submitReview = async (req, res, next) => {
-  const { paperId, verdict, review } = req.body;
+  console.log(req.body);
+  const { paperId, verdict, review, plagiarismPercentage } = req.body;
   const user = req.user;
   console.log(req.user);
   try {
@@ -196,8 +197,9 @@ exports.submitReview = async (req, res, next) => {
       return sendError(401, 'You should be reviewer to submit review', res);
     }
 
-    paper.status = verdict == 'approve' ? 'Approved' : 'Rejected';
+    paper.status = verdict == 'accept' ? 'Approved' : 'Rejected';
     paper.review = review;
+    paper.plagiarismPercentage = plagiarismPercentage;
     await paper.save();
 
     return res
@@ -277,4 +279,30 @@ exports.sendUserEmail = async (req, res, next) => {
     success: true,
     message: 'Emails have been send successfully',
   });
+};
+
+// Assigning a reviewer for a paper
+exports.getReviewPapers = async (req, res, next) => {
+  const { conferenceId } = req.params;
+  const user = req.user;
+  try {
+    const conference = await Conference.findById(conferenceId);
+    const papers = await Paper.find({
+      conferenceId: conferenceId,
+      reviewer: user._id,
+    });
+
+    if (!conference) {
+      return sendError(404, 'Invalid Conference', res);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Papers successfully fetched',
+      papers,
+      conference,
+    });
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
 };

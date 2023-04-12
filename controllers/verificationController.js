@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const { FRONTEND_URL } = require('../config/url');
 
 // Register a User
 exports.verifyUserEmail = async (req, res, next) => {
@@ -11,18 +12,16 @@ exports.verifyUserEmail = async (req, res, next) => {
     const user = await User.findById(id);
 
     if (!user) {
-      return res.send(`Invalid User`);
+      return res.redirect(`${FRONTEND_URL}/login?verify=0`);
     }
 
     if (user.isVerfiedEmail) {
-      return res.send(`Email verification is already done`);
+      return res.redirect(`${FRONTEND_URL}/login?verify=2`);
     }
     user.isVerfiedEmail = true;
     user.save();
-    return res.send(`Email verifified successfully`);
+    return res.redirect(`${FRONTEND_URL}/login?verify=1`);
   } catch (err) {
-    return res.send(
-      `Email verification failed, possibly the link is invalid or expired`
-    );
+    return res.redirect(`${FRONTEND_URL}/login?verify=0`);
   }
 };

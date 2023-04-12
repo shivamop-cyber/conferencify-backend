@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const { FRONTEND_URL, BACKEND_URL } = require('../config/url');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -184,7 +185,7 @@ exports.sendVerificationEmail = (userId, userEmail) => {
             <!-- start copy -->
             <tr>
               <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                <p style="margin: 0;">Tap the button below to confirm your email address. If you didn't create an account with <a href="https://conferencify.com">Conferencify</a>, you can safely delete this email.</p>
+                <p style="margin: 0;">Tap the button below to confirm your email address. If you didn't create an account with <a href="${FRONTEND_URL}">Conferencify</a>, you can safely delete this email.</p>
               </td>
             </tr>
             <!-- end copy -->
@@ -198,7 +199,7 @@ exports.sendVerificationEmail = (userId, userEmail) => {
                       <table border="0" cellpadding="0" cellspacing="0">
                         <tr>
                           <td align="center" bgcolor="#1a82e2" style="border-radius: 6px;">
-                            <a href="https://conferencify-backend.onrender.com/verify/${token}" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Verify Email</a>
+                            <a href="${BACKEND_URL}/verify/${token}" target="_blank" style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">Verify Email</a>
                           </td>
                         </tr>
                       </table>
@@ -213,7 +214,7 @@ exports.sendVerificationEmail = (userId, userEmail) => {
             <tr>
               <td align="left" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                 <p style="margin: 0;">If that doesn't work, copy and paste the following link in your browser:</p>
-                <p style="margin: 0;"><a href="https://conferencify-backend.onrender.com/verify/${token}" target="_blank">https://conferencify-backend.onrender.com/verify/${token}</a></p>
+                <p style="margin: 0;"><a href="${BACKEND_URL}/verify/${token}" target="_blank">${BACKEND_URL}/verify/${token}</a></p>
               </td>
             </tr>
             <!-- end copy -->

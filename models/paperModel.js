@@ -29,7 +29,6 @@ const paperSchema = new mongoose.Schema({
   paperId: {
     type: Number,
     required: true,
-    unique: true,
   },
   plagiarismPercentage: {
     type: String,

@@ -152,6 +152,7 @@ exports.submitPaper = async (req, res, next) => {
       paper,
     });
   } catch (err) {
+    console.log(err);
     return sendError(500, 'Server Error Occured', res);
   }
 };

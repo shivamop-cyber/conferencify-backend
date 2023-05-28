@@ -102,8 +102,12 @@ exports.submitPaper = async (req, res, next) => {
   try {
     const conference = await Conference.findById(conferenceId);
 
+    if (conference.isConferenceOpen === false) {
+      sendError(404, 'Conference has been closed', res);
+    }
+
     if (!conference) {
-      sendError(404, 'Please submit paper to a valid conference');
+      sendError(404, 'Please submit paper to a valid conference', res);
     }
 
     const authorIds = [];
@@ -193,6 +197,11 @@ exports.submitReview = async (req, res, next) => {
   console.log(req.user);
   try {
     const paper = await Paper.findById(paperId);
+    const conference = await Conference.findById(paper.conferenceId);
+
+    if (conference.isConferenceOpen === false) {
+      sendError(404, 'Conference has been closed', res);
+    }
 
     if (!paper.reviewer.equals(user._id)) {
       return sendError(401, 'You should be reviewer to submit review', res);
@@ -326,6 +335,115 @@ exports.submitPlagPercentage = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Plagiarism Percentage Successfully Saved',
+    });
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+exports.changeConferenceStatus = async (req, res, next) => {
+  const { conferenceId } = req.body;
+  const user = req.user;
+  try {
+    const conference = await Conference.findById(conferenceId);
+
+    if (!conference.admin.equals(user._id)) {
+      return sendError(401, 'You should be an admin to assign reviewer', res);
+    }
+
+    conference.isConferenceOpen = !conference.isConferenceOpen;
+
+    await conference.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Conference Status changed to ${
+        conference.isConferenceOpen === true ? 'Open' : 'Closed'
+      }`,
+    });
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+exports.changeConferenceConfiguration = async (req, res, next) => {
+  const { conferenceId, confData } = req.body;
+  const user = req.user;
+  try {
+    const conference = await Conference.findById(conferenceId);
+
+    if (!conference.admin.equals(user._id)) {
+      return sendError(401, 'You should be an admin to assign reviewer', res);
+    }
+
+    conference.name = confData.name;
+    conference.acronym = confData.acronym;
+    conference.webpage = confData.webpage;
+    conference.venue = confData.venue;
+    conference.city = confData.city;
+    conference.country = confData.country;
+    conference.primaryArea = confData.primaryArea;
+    conference.secondaryArea = confData.secondaryArea;
+    conference.topics = confData.topics;
+
+    await conference.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully updated the conference Info`,
+      conference: conference,
+    });
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+exports.getReviewersSummary = async (req, res, next) => {
+  const { conferenceId } = req.params;
+  const user = req.user;
+
+  try {
+    const conference = await Conference.findById(conferenceId).populate({
+      path: 'reviewers',
+      populate: { path: 'userId' },
+    });
+
+    if (!conference.admin.equals(user._id)) {
+      return sendError(401, 'You should be an admin to assign reviewer', res);
+    }
+
+    const papers = await Paper.find({ conferenceId: conferenceId });
+    const reviewers = conference.reviewers;
+
+    const reviewerInfo = reviewers.map((reviewer, index) => {
+      console.log(reviewer.userId._id, index);
+      const filteredPapers = papers.filter((paper) => {
+        console.log(paper);
+        return paper.reviewer && paper.reviewer.equals(reviewer.userId._id);
+      });
+
+      console.log('here');
+      const unreviewedPapers = filteredPapers.filter(
+        (paper) => paper.status === 'Pending'
+      );
+
+      const totalAssigned = filteredPapers.length;
+      return {
+        reviewerName: reviewer.userId.name,
+        id: index,
+        email: reviewer.userId.email,
+        totalAssigned: totalAssigned,
+        totalCompleted: totalAssigned - unreviewedPapers.length,
+        totalLeft: unreviewedPapers.length,
+      };
+    });
+
+    console.log(reviewerInfo);
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully updated the conference Info`,
+      reviewInfo: reviewerInfo,
     });
   } catch (err) {
     return sendError(500, 'Server Error Occured', res);

@@ -58,6 +58,10 @@ const conferenceSchema = new mongoose.Schema({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Paper' }],
     default: [],
   },
+  isConferenceOpen: {
+    type: Boolean,
+    default: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

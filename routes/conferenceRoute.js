@@ -10,6 +10,9 @@ const {
   sendUserEmail,
   getReviewPapers,
   submitPlagPercentage,
+  changeConferenceStatus,
+  changeConferenceConfiguration,
+  getReviewersSummary,
 } = require('../controllers/conferenceController');
 const { authenticateUser } = require('../middleware/auth');
 
@@ -36,5 +39,15 @@ router.route('/paper/review/submit').post(authenticateUser, submitReview);
 router.route('/email/send').post(authenticateUser, sendUserEmail);
 
 router.route('/plag/submit').post(authenticateUser, submitPlagPercentage);
+
+router.route('/status/change').post(authenticateUser, changeConferenceStatus);
+
+router
+  .route('/configuration/change')
+  .post(authenticateUser, changeConferenceConfiguration);
+
+router
+  .route('/reviewer/summary/:conferenceId')
+  .get(authenticateUser, getReviewersSummary);
 
 module.exports = router;

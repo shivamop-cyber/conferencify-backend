@@ -188,7 +188,7 @@ exports.assignReviewer = async (req, res, next) => {
 
 exports.submitReview = async (req, res, next) => {
   console.log(req.body);
-  const { paperId, verdict, review, plagiarismPercentage } = req.body;
+  const { paperId, verdict, review } = req.body;
   const user = req.user;
   console.log(req.user);
   try {
@@ -200,7 +200,6 @@ exports.submitReview = async (req, res, next) => {
 
     paper.status = verdict == 'accept' ? 'Approved' : 'Rejected';
     paper.review = review;
-    paper.plagiarismPercentage = plagiarismPercentage;
     await paper.save();
 
     return res
@@ -267,7 +266,9 @@ exports.sendUserEmail = async (req, res, next) => {
           mailSubject,
           mailBody,
           authors[j].name,
-          conference.acronym
+          conference.acronym,
+          paperId,
+          paper.title
         );
       }
     }
@@ -302,6 +303,29 @@ exports.getReviewPapers = async (req, res, next) => {
       message: 'Papers successfully fetched',
       papers,
       conference,
+    });
+  } catch (err) {
+    return sendError(500, 'Server Error Occured', res);
+  }
+};
+
+exports.submitPlagPercentage = async (req, res, next) => {
+  const { conferenceId, paperId, plagPercentage } = req.body;
+  const user = req.user;
+  try {
+    const conference = await Conference.findById(conferenceId);
+    const paper = await Paper.findById(paperId);
+
+    if (!conference.admin.equals(user._id)) {
+      return sendError(401, 'You should be an admin to assign reviewer', res);
+    }
+
+    paper.plagiarismPercentage = plagPercentage;
+    await paper.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Plagiarism Percentage Successfully Saved',
     });
   } catch (err) {
     return sendError(500, 'Server Error Occured', res);

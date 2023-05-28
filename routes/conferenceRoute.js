@@ -9,6 +9,7 @@ const {
   getConference,
   sendUserEmail,
   getReviewPapers,
+  submitPlagPercentage,
 } = require('../controllers/conferenceController');
 const { authenticateUser } = require('../middleware/auth');
 
@@ -33,5 +34,7 @@ router.route('/reviewer/assign').post(authenticateUser, assignReviewer);
 router.route('/paper/review/submit').post(authenticateUser, submitReview);
 
 router.route('/email/send').post(authenticateUser, sendUserEmail);
+
+router.route('/plag/submit').post(authenticateUser, submitPlagPercentage);
 
 module.exports = router;

@@ -294,10 +294,12 @@ exports.sendUserEmail = async (
   userEmail,
   mailSubject,
   MailBody,
-  userName,
-  conferenceName
+  AUTHOR,
+  conferenceName,
+  PAPER_ID,
+  PAPER_TITLE
 ) => {
-  const mailText = `
+  let mailText = `
   <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -323,8 +325,6 @@ exports.sendUserEmail = async (
               <p
                 style="margin: 0; line-height: 25px; background: #fff; border-radius: 3px;">
                 <span style="padding: 20px 30px; display: block; border-bottom: 2px solid #fff8e8;">
-                  Dear ${userName},
-                  <br />
                 <span style="padding: 20px 30px; display: block;">
                 
                 <span style="display: inline-block; line-height: 22px;">
@@ -333,9 +333,6 @@ exports.sendUserEmail = async (
                   
                   <br />
                   <span style="display: inline-block; margin-top: 20px; line-height: 22px;">
-                      Best Regards,
-                      <br />
-                      ${conferenceName}
                   </span> 
                 </span>
               </p>
@@ -351,6 +348,14 @@ exports.sendUserEmail = async (
     </body>
   </html>
   `;
+
+  for (let i = 0; i < 10; i++) {
+    mailText = mailText
+      .replace('${PAPER_ID}', PAPER_ID)
+      .replace('${AUTHOR}', AUTHOR)
+      .replace('${PAPER_TITLE}', PAPER_TITLE)
+      .replace('${n}', '<br></br>');
+  }
   const mailConfigurations = getMailingConfigurations(
     userEmail,
     mailSubject,

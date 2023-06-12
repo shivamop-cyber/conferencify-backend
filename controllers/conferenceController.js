@@ -103,11 +103,11 @@ exports.submitPaper = async (req, res, next) => {
     const conference = await Conference.findById(conferenceId);
 
     if (conference.isConferenceOpen === false) {
-      sendError(404, 'Conference has been closed', res);
+      return sendError(404, 'Conference has been closed', res);
     }
 
     if (!conference) {
-      sendError(404, 'Please submit paper to a valid conference', res);
+      return sendError(404, 'Please submit paper to a valid conference', res);
     }
 
     const authorIds = [];
@@ -200,7 +200,7 @@ exports.submitReview = async (req, res, next) => {
     const conference = await Conference.findById(paper.conferenceId);
 
     if (conference.isConferenceOpen === false) {
-      sendError(404, 'Conference has been closed', res);
+      return sendError(404, 'Conference has been closed', res);
     }
 
     if (!paper.reviewer.equals(user._id)) {
